@@ -4,12 +4,13 @@ import "./App.css";
 type Move = "rock" | "paper" | "scissors";
 const moves: readonly Move[] = ["rock", "paper", "scissors"];
 
-function GetRandomMove(): Move {
+function getRandomMove(): Move {
   return moves[Math.floor(3 * Math.random())];
 }
 
 function App() {
-  return <div>Computer Move: {GetRandomMove()}</div>;
+  const [computerMove, setComputerMove] = React.useState<Move>(getRandomMove());
+  return <div>Computer Move: {computerMove}</div>;
 }
 
 export default App;
