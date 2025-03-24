@@ -44,6 +44,7 @@ class Player {
    */
   makeHand(): Hand {
     const hand = [new Card("rock"), new Card("paper"), new Card("scissors")];
+    return hand;
     return this.addHandModifiers(hand);
   }
 
@@ -61,6 +62,12 @@ class Player {
       hand = fn(hand);
     }
     return hand;
+  }
+
+  DEBUG_printHand() {
+    return this.hand.map((elem, idx) =>
+      elem.DEBUG_toString().concat(idx === this.hand.length - 1 ? "" : ", ")
+    );
   }
 }
 

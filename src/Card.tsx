@@ -7,6 +7,10 @@ class Card {
   constructor(cardType: Move) {
     this.cardType = cardType;
   }
+
+  DEBUG_toString() {
+    return String(this.cardType);
+  }
 }
 
 export default Card;
