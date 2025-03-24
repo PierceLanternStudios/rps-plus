@@ -29,7 +29,7 @@ class Player {
    *                hand.
    */
   constructor() {
-    this.hand = this.makeHand();
+    this.hand = [];
     this.money = 0;
     this.handPipeline = [];
   }
@@ -42,10 +42,9 @@ class Player {
    * Returns:       a new hand object for the player.
    * Effects:       Removes the old hand data and replaces it with a new hand.
    */
-  makeHand(): Hand {
+  makeHand() {
     const hand = [new Card("rock"), new Card("paper"), new Card("scissors")];
-    return hand;
-    return this.addHandModifiers(hand);
+    this.hand = this.addHandModifiers(hand);
   }
 
   /**
@@ -64,6 +63,11 @@ class Player {
     return hand;
   }
 
+  /*
+  ---DEBUG_printHand---
+  A debug function that can be called to print the contents of a player's 
+  hands as an array of strings.
+  */
   DEBUG_printHand() {
     return this.hand.map((elem, idx) =>
       elem.DEBUG_toString().concat(idx === this.hand.length - 1 ? "" : ", ")
