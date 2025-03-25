@@ -7,14 +7,15 @@ import cardCSS from "./card.module.css";
 import Card from "./Card";
 
 type GamePhase = "pre-Game" | "Draw" | "Game" | "Results" | "Shop";
-type leader = "Player 1" | "Player 2";
+type gamePlayer = "Player 1" | "Player 2";
+type GameResult = gamePlayer | "Tie";
 
 /**
  * GAME_PLAYERS
  *
  * This will be a variable that will allow configuration of who is
  * playing the game. For the time being, this must be set to Player
- * AIPlayer, but in the future this will be expanded to allow more
+ * AIPlayer, but in the future this may be expanded to allow more
  * choices.
  *
  */
@@ -29,7 +30,9 @@ function App() {
   const [gamePhase, setGamePhase] = React.useState<GamePhase>("pre-Game");
   const [round, setRound] = React.useState(0);
   const [playerCard, setPlayerCard] = React.useState<Card | null>(null);
-  const [leader, setleader] = React.useState<leader>("Player 1");
+  const [computerCard, setComputerCard] = React.useState<Card | null>(null);
+  const [leader, setleader] = React.useState<gamePlayer>("Player 1");
+  const [roundResult, setRoundResult] = React.useState<GameResult>("Tie");
 
   // ###################################################################
   // =================  Callback Functions:  ===========================
@@ -44,6 +47,39 @@ function App() {
     setPlayerCard(card);
     card.playCard();
     setGamePhase("Results");
+  }
+
+  // ###################################################################
+  // =================  Solve Game Results:  ===========================
+  // ###################################################################
+
+  /**
+   * name:          processResults
+   * description:   Solves the result of a round, and updates state variables
+   *                accordingly for display.
+   * arguments:     none
+   * returns:       none
+   * effects:       will update round state variables for display.
+   * notes:         This function uses the `!` operator a few times. This is
+   *                guaranteed to be safe, as the playerCard and computerCard
+   *                state are guaranteedly set to a non-null card before this
+   *                function is called. In fact, the only time those variables
+   *                are ever null is when they are first declared, and are
+   *                then assigned at the beginning of the first round.
+   */
+  function processResults() {
+    // determine who would win this round:
+    const MOVES: Move[] = ["rock", "scissors", "paper"];
+    if (playerCard?.cardType === computerCard?.cardType) {
+      setRoundResult("Tie");
+    } else {
+      setRoundResult(
+        MOVES.indexOf(playerCard!.cardType) ===
+          (MOVES.indexOf(computerCard!.cardType) + 1) % 3
+          ? "Player 2"
+          : "Player 1"
+      );
+    }
   }
 
   // ###################################################################
@@ -70,6 +106,9 @@ function App() {
   }
 
   function renderResults() {
+    setComputerCard((players[1] as AIPlayer).selectCardToPlay());
+    computerCard?.playCard();
+    processResults();
     return <div>results:</div>;
   }
 
