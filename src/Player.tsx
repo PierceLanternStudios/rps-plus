@@ -7,18 +7,15 @@ type Hand = Card[];
 type HandModifier = (input: Hand) => Hand;
 type RoundModifier = (input: RoundResult) => RoundResult;
 
-/*
-Player Class
-
-This is the base class for a player. This contains a Players hand, and their
-respective modifier pipelines for both drawing their hand and playing out 
-rounds.
-*/
+/**
+ * Player Class
+ *
+ * This is the base class for a player. This contains a Players hand, and their
+ * respective modifier pipelines for both drawing their hand and playing out
+ * rounds.
+ *
+ */
 class Player {
-  hand: Hand;
-  money: Number;
-  handPipeline: HandModifier[];
-
   /**
    * Function:      constructor
    * Description:   Called at the creation of a new player object. Sets all
@@ -28,11 +25,11 @@ class Player {
    * Effects:       Creates a new player object, and spawns them a starting
    *                hand.
    */
-  constructor() {
-    this.hand = [];
-    this.money = 0;
-    this.handPipeline = [];
-  }
+  constructor(
+    public hand: Hand = [],
+    public money: number = 0,
+    public handPipeline: HandModifier[] = []
+  ) {}
 
   /**
    * Function:      makeHand
@@ -43,7 +40,11 @@ class Player {
    * Effects:       Removes the old hand data and replaces it with a new hand.
    */
   makeHand() {
-    const hand = [new Card("rock"), new Card("paper"), new Card("scissors")];
+    const hand = [
+      new Card("rock", this),
+      new Card("paper", this),
+      new Card("scissors", this),
+    ];
     this.hand = this.addHandModifiers(hand);
   }
 
@@ -63,11 +64,23 @@ class Player {
     return hand;
   }
 
-  /*
-  ---DEBUG_printHand---
-  A debug function that can be called to print the contents of a player's 
-  hands as an array of strings.
-  */
+  /**
+   * Name:          removeCard
+   * Description:   removes a specified card from the hand. If multiple are present,
+   *                will remove the first occurence of this card.
+   * Arguments:     a Card to delete from this players hand
+   * Returns:       none
+   * Effects:       Will remove the specified card from the hand.
+   */
+  removeCard(card: Card) {
+    this.hand.splice(this.hand.indexOf(card), 1);
+  }
+
+  /**
+   * DEBUG_printHand
+   * A debug function that can be called to print the contents of a player's
+   * hands as an array of strings.
+   */
   DEBUG_printHand() {
     return this.hand.map((elem, idx) =>
       elem.DEBUG_toString().concat(idx === this.hand.length - 1 ? "" : ", ")

@@ -1,11 +1,11 @@
 import React from "react";
-import "./App.css";
-import { Move, moves } from "./Move";
+import { type Move, moves } from "./Move";
 import Player from "./Player";
 import gamePhaseCSS from "./gamePhase.module.css";
 import cardCSS from "./card.module.css";
+import Card from "./Card";
 
-type GamePhase = "pre-Game" | "Draw" | "Game" | "Shop";
+type GamePhase = "pre-Game" | "Draw" | "Game" | "Results" | "Shop";
 
 function getRandomMove(): Move {
   return moves[Math.floor(3 * Math.random())];
@@ -16,6 +16,7 @@ function App() {
   const [player, SetPlayer] = React.useState<Player>(new Player());
   const [gamePhase, setGamePhase] = React.useState<GamePhase>("pre-Game");
   const [round, setRound] = React.useState(0);
+  const [playerCard, setPlayerCard] = React.useState<Card | null>(null);
 
   // new round
   function newRound() {
@@ -41,12 +42,18 @@ function App() {
     );
   }
 
+  function renderResults() {
+    return <div>results:</div>;
+  }
+
   function renderHand() {
     return (
       <div className={cardCSS.hand_container}>
         <ul>
           {player.hand.map((elem) => (
-            <button className={cardCSS.button}>{elem.DEBUG_toString()}</button>
+            <button className={cardCSS.button} onClick={elem.playCard}>
+              {elem.DEBUG_toString()}
+            </button>
           ))}
         </ul>
       </div>
@@ -61,6 +68,8 @@ function App() {
       return renderDrawPhase();
     case "Game":
       return renderGamePhase();
+    case "Results":
+      return renderResults();
     case "Shop":
       return <div>SHOP!</div>;
   }
