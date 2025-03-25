@@ -83,6 +83,7 @@ function App() {
     player.makeHand();
     computer.makeHand();
     setGamePhase("Game");
+    return <div>draw!</div>;
   }
 
   function renderGamePhase() {
