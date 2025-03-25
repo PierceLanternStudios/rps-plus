@@ -1,5 +1,5 @@
 import React from "react";
-import { type Move, moves } from "./Move";
+import { type Move, MOVES } from "./Move";
 import Player from "./Player";
 import AIPlayer from "./AIPlayer";
 import gamePhaseCSS from "./gamePhase.module.css";
@@ -10,27 +10,15 @@ type GamePhase = "pre-Game" | "Draw" | "Game" | "Results" | "Shop";
 type gamePlayer = "Player 1" | "Player 2";
 type GameResult = gamePlayer | "Tie";
 
-/**
- * GAME_PLAYERS
- *
- * This will be a variable that will allow configuration of who is
- * playing the game. For the time being, this must be set to Player
- * AIPlayer, but in the future this may be expanded to allow more
- * choices.
- *
- */
-const GAME_PLAYERS = [new Player(), new AIPlayer()];
-
 function App() {
   // ###################################################################
   // =================  Declare State Vars:  ===========================
   // ###################################################################
 
-  const [players, SetPlayers] = React.useState<Player[]>(GAME_PLAYERS);
+  const [player, setPlayer] = React.useState<Player>(new Player());
+  const [computer, setComputer] = React.useState<AIPlayer>(new AIPlayer());
   const [gamePhase, setGamePhase] = React.useState<GamePhase>("pre-Game");
   const [round, setRound] = React.useState(0);
-  const [playerCard, setPlayerCard] = React.useState<Card | null>(null);
-  const [computerCard, setComputerCard] = React.useState<Card | null>(null);
   const [leader, setleader] = React.useState<gamePlayer>("Player 1");
   const [roundResult, setRoundResult] = React.useState<GameResult>("Tie");
 
@@ -44,8 +32,8 @@ function App() {
   }
 
   function onCardSelected(card: Card) {
-    setPlayerCard(card);
-    card.playCard();
+    player.playCard(card);
+    computer.playCard();
     setGamePhase("Results");
   }
 
@@ -69,13 +57,12 @@ function App() {
    */
   function processResults() {
     // determine who would win this round:
-    const MOVES: Move[] = ["rock", "scissors", "paper"];
-    if (playerCard?.cardType === computerCard?.cardType) {
+    if (player.playedCard!.cardType === computer.playedCard!.cardType) {
       setRoundResult("Tie");
     } else {
       setRoundResult(
-        MOVES.indexOf(playerCard!.cardType) ===
-          (MOVES.indexOf(computerCard!.cardType) + 1) % 3
+        MOVES.indexOf(player.playedCard!.cardType) ===
+          (MOVES.indexOf(computer.playedCard!.cardType) + 1) % 3
           ? "Player 2"
           : "Player 1"
       );
@@ -93,10 +80,9 @@ function App() {
 
   // render draw phase, in case I want to do any draw animations or anything:
   function renderDrawPhase() {
-    players[0].makeHand();
-    players[1].makeHand();
+    player.makeHand();
+    computer.makeHand();
     setGamePhase("Game");
-    return null;
   }
 
   function renderGamePhase() {
@@ -106,8 +92,6 @@ function App() {
   }
 
   function renderResults() {
-    setComputerCard((players[1] as AIPlayer).selectCardToPlay());
-    computerCard?.playCard();
     processResults();
     return <div>results:</div>;
   }
@@ -120,7 +104,7 @@ function App() {
     return (
       <div className={cardCSS.hand_container}>
         <ul>
-          {players[0].hand.map((card) => (
+          {player.hand.map((card) => (
             <button
               className={cardCSS.button}
               onClick={() => onCardSelected(card)}

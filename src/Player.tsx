@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "./Card";
 import RoundResult from "./RoundResult";
-import { Move, moves } from "./Move";
+import { type Move, MOVES } from "./Move";
 
 type Hand = Card[];
 type HandModifier = (input: Hand) => Hand;
@@ -28,7 +28,8 @@ class Player {
   constructor(
     public hand: Hand = [],
     public money: number = 0,
-    public handPipeline: HandModifier[] = []
+    public handPipeline: HandModifier[] = [],
+    public playedCard: Card | null = null
   ) {}
 
   /**
@@ -40,11 +41,7 @@ class Player {
    * Effects:       Removes the old hand data and replaces it with a new hand.
    */
   makeHand() {
-    const hand = [
-      new Card("rock", this),
-      new Card("paper", this),
-      new Card("scissors", this),
-    ];
+    const hand = MOVES.map((move) => new Card(move));
     this.hand = this.addHandModifiers(hand);
   }
 
@@ -62,6 +59,21 @@ class Player {
       hand = fn(hand);
     }
     return hand;
+  }
+
+  /**
+   * Name:          playCard
+   * Description:   Called to play a card into the current round. Will
+   *                remove this card from hand, and place it into the
+   *                "playedCard" slot.
+   * Arguments:     A card to `play`
+   * Returns:       none
+   * Effects:       Removes this card from the players hand, and adds it
+   *                to the playedCard slot.
+   */
+  playCard(card: Card) {
+    this.playedCard = card;
+    this.removeCard(card);
   }
 
   /**

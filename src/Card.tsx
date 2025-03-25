@@ -1,21 +1,9 @@
 import React from "react";
-import { Move } from "./Move";
+import { type Move, MOVES } from "./Move";
 import Player from "./Player";
 
 class Card {
-  constructor(public cardType: Move, public owningPlayer: Player) {}
-
-  /**
-   * Name:          playCard
-   * Description:   Called to play this card into the current round. Will
-   *                change the game into results.
-   * Arguments:     none
-   * Returns:       none
-   * Effects:       Removes this card from the players hand.
-   */
-  playCard() {
-    this.owningPlayer.removeCard(this);
-  }
+  constructor(public cardType: Move) {}
 
   /**
    * Name:          DEBUG_toString

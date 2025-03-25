@@ -12,16 +12,18 @@ import Card from "./Card";
 class AIPlayer extends Player {
   /**
    * Name:            selectCardToPlay
-   * Description:     The core function of the AI player. Selects
-   *                  A random card from their hand and returns it
-   *                  to be played.
+   * Description:     The core function of the AI player. A super
+   *                  function over the base `playCard` that selects
+   *                  a random card from hand and plays that one
+   *                  automatically.
    * Arguments:       none
-   * Returns:         A random card from the AI Player's hand.
-   * Effects:         None. Note that this function does NOT play
-   *                  the card, it simply selects a random one.
+   * Returns:         none
+   * Effects:         This will pick a random card from hand and play
+   *                  it, which constitutes removing it from hand and
+   *                  playing it into the `playedCard` slot.
    */
-  selectCardToPlay(): Card {
-    return this.hand[Math.floor(Math.random() * this.hand.length)];
+  playCard() {
+    super.playCard(this.hand[Math.floor(Math.random() * this.hand.length)]);
   }
 }
 
