@@ -1,28 +1,54 @@
 import React from "react";
 import { type Move, moves } from "./Move";
 import Player from "./Player";
+import AIPlayer from "./AIPlayer";
 import gamePhaseCSS from "./gamePhase.module.css";
 import cardCSS from "./card.module.css";
 import Card from "./Card";
 
 type GamePhase = "pre-Game" | "Draw" | "Game" | "Results" | "Shop";
+type leader = "Player 1" | "Player 2";
 
-function getRandomMove(): Move {
-  return moves[Math.floor(3 * Math.random())];
-}
+/**
+ * GAME_PLAYERS
+ *
+ * This will be a variable that will allow configuration of who is
+ * playing the game. For the time being, this must be set to Player
+ * AIPlayer, but in the future this will be expanded to allow more
+ * choices.
+ *
+ */
+const GAME_PLAYERS = [new Player(), new AIPlayer()];
 
 function App() {
-  // Declare State:
-  const [player, SetPlayer] = React.useState<Player>(new Player());
+  // ###################################################################
+  // =================  Declare State Vars:  ===========================
+  // ###################################################################
+
+  const [players, SetPlayers] = React.useState<Player[]>(GAME_PLAYERS);
   const [gamePhase, setGamePhase] = React.useState<GamePhase>("pre-Game");
   const [round, setRound] = React.useState(0);
   const [playerCard, setPlayerCard] = React.useState<Card | null>(null);
+  const [leader, setleader] = React.useState<leader>("Player 1");
 
-  // new round
+  // ###################################################################
+  // =================  Callback Functions:  ===========================
+  // ###################################################################
   function newRound() {
     setGamePhase("Draw");
     setRound(round + 1);
+    setleader(leader === "Player 1" ? "Player 2" : "Player 1");
   }
+
+  function onCardSelected(card: Card) {
+    setPlayerCard(card);
+    card.playCard();
+    setGamePhase("Results");
+  }
+
+  // ###################################################################
+  // =================  Render Game Phases:  ===========================
+  // ###################################################################
 
   // render pregame screen:
   function renderPreGame() {
@@ -31,7 +57,8 @@ function App() {
 
   // render draw phase, in case I want to do any draw animations or anything:
   function renderDrawPhase() {
-    player.makeHand();
+    players[0].makeHand();
+    players[1].makeHand();
     setGamePhase("Game");
     return null;
   }
@@ -46,19 +73,30 @@ function App() {
     return <div>results:</div>;
   }
 
+  // ###################################################################
+  // =================  Render Subcomponents:  =========================
+  // ###################################################################
+
   function renderHand() {
     return (
       <div className={cardCSS.hand_container}>
         <ul>
-          {player.hand.map((elem) => (
-            <button className={cardCSS.button} onClick={elem.playCard}>
-              {elem.DEBUG_toString()}
+          {players[0].hand.map((card) => (
+            <button
+              className={cardCSS.button}
+              onClick={() => onCardSelected(card)}
+            >
+              {card.DEBUG_toString()}
             </button>
           ))}
         </ul>
       </div>
     );
   }
+
+  // ###################################################################
+  // ======================  Main Loop:  ===============================
+  // ###################################################################
   //determine what to do based on the phase of the game:
   switch (gamePhase) {
     case "pre-Game":
