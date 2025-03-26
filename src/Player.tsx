@@ -1,11 +1,8 @@
-import React from "react";
 import Card from "./Card";
-import RoundResult from "./RoundResult";
 import { type Move, MOVES } from "./Move";
 
 type Hand = Card[];
 type HandModifier = (input: Hand) => Hand;
-type RoundModifier = (input: RoundResult) => RoundResult;
 
 /**
  * Player Class

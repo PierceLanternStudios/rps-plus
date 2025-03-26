@@ -3,11 +3,13 @@ import { type Move, MOVES } from "./Move";
 import Player from "./Player";
 import AIPlayer from "./AIPlayer";
 import gamePhaseCSS from "./gamePhase.module.css";
+import ResultPhaseCSS from "./resultsPhase.module.css";
 import cardCSS from "./card.module.css";
+import RoundModifier from "./RoundModifier";
 import Card from "./Card";
 
 type GamePhase = "pre-Game" | "Draw" | "Game" | "Results" | "Shop";
-type gamePlayer = "Player 1" | "Player 2";
+type gamePlayer = "You" | "Computer";
 type GameResult = gamePlayer | "Tie";
 
 function App() {
@@ -19,8 +21,18 @@ function App() {
   const [computer, setComputer] = React.useState<AIPlayer>(new AIPlayer());
   const [gamePhase, setGamePhase] = React.useState<GamePhase>("pre-Game");
   const [round, setRound] = React.useState(0);
-  const [leader, setleader] = React.useState<gamePlayer>("Player 1");
+  const [resultsSolved, setResultsSolved] = React.useState<boolean>(false);
+  const [roundPipeline, setRoundPipeline] = React.useState<RoundModifier[]>([]);
+
+  // round-end parameters:
+  const [roundMoney, setRoundMoney] = React.useState<number>(0);
   const [roundResult, setRoundResult] = React.useState<GameResult>("Tie");
+
+  // non-state parameters from round ending:
+  const roundEffects: string[] = [];
+
+  const MODIFIER_FUNCTIONS = GENERATE_MODIFIER_FUNCTIONS();
+  roundPipeline.push(MODIFIER_FUNCTIONS[0]);
 
   // ###################################################################
   // =================  Callback Functions:  ===========================
@@ -28,12 +40,12 @@ function App() {
   function newRound() {
     setGamePhase("Draw");
     setRound(round + 1);
-    setleader(leader === "Player 1" ? "Player 2" : "Player 1");
   }
 
   function onCardSelected(card: Card) {
     player.playCard(card);
     computer.playCard();
+    setResultsSolved(false);
     setGamePhase("Results");
   }
 
@@ -56,6 +68,9 @@ function App() {
    *                then assigned at the beginning of the first round.
    */
   function processResults() {
+    // check if we've already computed this render:
+    if (resultsSolved) return;
+
     // determine who would win this round:
     if (player.playedCard!.cardType === computer.playedCard!.cardType) {
       setRoundResult("Tie");
@@ -63,10 +78,18 @@ function App() {
       setRoundResult(
         MOVES.indexOf(player.playedCard!.cardType) ===
           (MOVES.indexOf(computer.playedCard!.cardType) + 1) % 3
-          ? "Player 2"
-          : "Player 1"
+          ? "Computer"
+          : "You"
       );
     }
+
+    //perform round-end pipeline effects:
+    for (const mod of roundPipeline) {
+      mod.fn();
+    }
+
+    // mark this as solved:
+    setResultsSolved(true);
   }
 
   // ###################################################################
@@ -94,7 +117,23 @@ function App() {
 
   function renderResults() {
     processResults();
-    return <div>results:</div>;
+    console.log(roundEffects);
+    return (
+      <div className={ResultPhaseCSS.container}>
+        <span>Round #{round}:</span>
+        <span>Computer Played: {computer.playedCard!.DEBUG_toString()}</span>
+        <span>You Played: {player.playedCard!.DEBUG_toString()}</span>
+        <span>
+          Round Effects: {renderRoundEffects()}
+          {roundEffects}
+        </span>
+        <span>Round Winner: {roundResult}!</span>
+        <span>
+          <button onClick={newRound}>New Round!</button>
+          <button onClick={generateShop}>Go To Shop!</button>
+        </span>
+      </div>
+    );
   }
 
   // ###################################################################
@@ -118,6 +157,19 @@ function App() {
     );
   }
 
+  function renderRoundEffects() {
+    return (
+      <div>
+        <ul>
+          {roundEffects.map((elem) => (
+            <li>{elem}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+  function generateShop() {}
+
   // ###################################################################
   // ======================  Main Loop:  ===============================
   // ###################################################################
@@ -135,20 +187,19 @@ function App() {
     case "Shop":
       return <div>SHOP!</div>;
   }
+
+  // ###################################################################
+  // ===============  Modifier Function Definitions:  ==================
+  // ###################################################################
+
+  function GENERATE_MODIFIER_FUNCTIONS(): RoundModifier[] {
+    return [
+      new RoundModifier("TestFunction", 100, () => {
+        setRound(100);
+        roundEffects.push("Set round to 100");
+      }),
+    ];
+  }
 }
 
 export default App;
-/*
-
-
-
-*/
-// OLD APP functionality:
-
-// const [computerMove, setComputerMove] = React.useState(getRandomMove());
-// const [player, SetPlayer] = React.useState(new Player());
-// return (
-//   <div>
-//     Computer Move: {computerMove} Player Hand: {player.DEBUG_printHand()}
-//   </div>
-// );
