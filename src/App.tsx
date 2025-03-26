@@ -29,10 +29,11 @@ function App() {
   const [roundResult, setRoundResult] = React.useState<GameResult>("Tie");
 
   // non-state parameters from round ending:
-  const roundEffects: string[] = [];
+  const [roundEffects, setRoundEffects] = React.useState<string[]>([]);
 
-  const MODIFIER_FUNCTIONS = GENERATE_MODIFIER_FUNCTIONS();
-  roundPipeline.push(MODIFIER_FUNCTIONS[0]);
+  const [MODIFIER_FUNCTIONS, SMF] = React.useState<RoundModifier[]>(
+    GENERATE_MODIFIER_FUNCTIONS()
+  );
 
   // ###################################################################
   // =================  Callback Functions:  ===========================
@@ -71,6 +72,7 @@ function App() {
     // check if we've already computed this render:
     if (resultsSolved) return;
 
+    console.log("Processing Results...");
     // determine who would win this round:
     if (player.playedCard!.cardType === computer.playedCard!.cardType) {
       setRoundResult("Tie");
@@ -86,6 +88,7 @@ function App() {
     //perform round-end pipeline effects:
     for (const mod of roundPipeline) {
       mod.fn();
+      console.log(roundPipeline.length);
     }
 
     // mark this as solved:
@@ -117,16 +120,12 @@ function App() {
 
   function renderResults() {
     processResults();
-    console.log(roundEffects);
     return (
       <div className={ResultPhaseCSS.container}>
         <span>Round #{round}:</span>
         <span>Computer Played: {computer.playedCard!.DEBUG_toString()}</span>
         <span>You Played: {player.playedCard!.DEBUG_toString()}</span>
-        <span>
-          Round Effects: {renderRoundEffects()}
-          {roundEffects}
-        </span>
+        <span>Round Effects: {renderRoundEffects()}</span>
         <span>Round Winner: {roundResult}!</span>
         <span>
           <button onClick={newRound}>New Round!</button>
@@ -176,6 +175,7 @@ function App() {
   //determine what to do based on the phase of the game:
   switch (gamePhase) {
     case "pre-Game":
+      console.log("PREGAME");
       return renderPreGame();
 
     case "Draw":
