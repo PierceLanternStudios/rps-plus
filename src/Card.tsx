@@ -16,5 +16,4 @@ class Card {
     return String(this.cardType);
   }
 }
-
 export default Card;
