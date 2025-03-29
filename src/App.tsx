@@ -32,6 +32,9 @@ function App() {
   const [gamePhase, setGamePhase] = React.useState<GamePhase>("pre-Game");
   const [round, setRound] = React.useState(0);
   const [roundResult, setRoundResult] = React.useState<GameResult>("Tie");
+  const [computerWins, setComputerWins] = React.useState<number>(0);
+  const [playerWins, setPlayerWins] = React.useState<number>(0);
+  const [ties, setTies] = React.useState<number>(0);
 
   // ###################################################################
   // =================  Callback Functions:  ===========================
@@ -61,16 +64,34 @@ function App() {
    */
   function processResults(player: Move, computer: Move) {
     // determine who would win this round:
-    if (player === computer) {
-      setRoundResult("Tie");
-    } else {
-      setRoundResult(
-        MOVES.indexOf(player!) === (MOVES.indexOf(computer!) + 1) % 3
-          ? "Computer"
-          : "You"
-      );
+    const winner = getWinner(player, computer);
+    setRoundResult(winner);
+
+    // keep track of stats:
+    switch (winner) {
+      case "You":
+        setPlayerWins(playerWins + 1);
+        break;
+      case "Computer":
+        setComputerWins(computerWins + 1);
+        break;
+      case "Tie":
+        setTies(ties + 1);
+        break;
     }
+
+    // display results:
     setGamePhase("Results");
+  }
+
+  function getWinner(player: Move, computer: Move): GameResult {
+    if (player === computer) {
+      return "Tie";
+    } else {
+      return MOVES.indexOf(player!) === (MOVES.indexOf(computer!) + 1) % 3
+        ? "Computer"
+        : "You";
+    }
   }
 
   /**
@@ -116,6 +137,14 @@ function App() {
         <span>Computer Played: {computerMove}</span>
         <span>You Played: {playerMove}</span>
         <span>Round Winner: {roundResult}!</span>
+        <span>
+          Stats:{" "}
+          <b>
+            {playerWins} {playerWins === 1 ? "win" : "wins"} / {computerWins}
+            {computerWins === 1 ? " loss" : " losses"} / {ties}
+            {ties === 1 ? " tie" : " ties"}
+          </b>
+        </span>
         <span>
           <button onClick={newRound}>New Round!</button>
         </span>
