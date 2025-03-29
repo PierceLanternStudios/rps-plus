@@ -1,0 +1,21 @@
+.button {
+  color: white;
+  background-color: darkslateblue;
+  border-radius: 10pt;
+  border: 0pt;
+  padding: 24pt 44pt;
+  margin: 0pt 5pt;
+  transition-duration: 0.3s;
+}
+
+.button:hover {
+  background-color: rgb(49, 41, 95);
+  scale: 1.2;
+  transition-duration: 0.3s;
+}
+
+.button:focus {
+  background-color: rgb(49, 41, 95);
+  scale: 1.2;
+  transition-duration: 0.3s;
+}
