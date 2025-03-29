@@ -1,0 +1,8 @@
+.container {
+  display: center;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100vh;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}

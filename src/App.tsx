@@ -1,8 +1,9 @@
 import React from "react";
 import { type Move, MOVES } from "./Move";
-import gamePhaseCSS from "./gamePhase.module.css";
+import gameCSS from "./game.module.css";
 import ResultPhaseCSS from "./resultsPhase.module.css";
-import cardCSS from "./card.module.css";
+import buttonCSS from "./button.main.module.css";
+import splashCSS from "./splash.module.css";
 
 type GamePhase = "pre-Game" | "Game" | "Results";
 type gamePlayer = "You" | "Computer";
@@ -121,12 +122,23 @@ function App() {
   // ###################################################################
 
   function renderPreGame() {
-    return <button onClick={newRound}>Begin Game</button>;
+    return (
+      <div className={splashCSS.container}>
+        <span>
+          <h1>Rock, Paper, Scissors!</h1>
+        </span>
+        <button onClick={newRound} className={buttonCSS.button}>
+          Begin Game
+        </button>
+      </div>
+    );
   }
 
   function renderGamePhase() {
     return (
-      <div className={gamePhaseCSS.container}>Play a Card! {renderHand()}</div>
+      <div className={gameCSS.container}>
+        <h2>Play a Card!</h2> {renderHand()}
+      </div>
     );
   }
 
@@ -146,7 +158,9 @@ function App() {
           </b>
         </span>
         <span>
-          <button onClick={newRound}>New Round!</button>
+          <button onClick={newRound} className={buttonCSS.button}>
+            New Round!
+          </button>
         </span>
       </div>
     );
@@ -158,7 +172,7 @@ function App() {
 
   function renderHand() {
     return (
-      <div className={cardCSS.hand_container}>
+      <div className={gameCSS.hand_container}>
         <ul>{MOVES.map((move) => renderCard(move))}</ul>
       </div>
     );
@@ -166,7 +180,10 @@ function App() {
 
   function renderCard(cardName: Move) {
     return (
-      <button className={cardCSS.button} onClick={() => onCardPlayed(cardName)}>
+      <button
+        className={buttonCSS.button}
+        onClick={() => onCardPlayed(cardName)}
+      >
         {cardName}
       </button>
     );
