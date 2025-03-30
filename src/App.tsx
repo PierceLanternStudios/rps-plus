@@ -144,17 +144,18 @@ function App() {
 
   function renderResults() {
     return (
-      <div className={ResultPhaseCSS.container}>
+      <div className={gameCSS.container}>
         <span>Round #{round}:</span>
-        <span>Computer Played: {computerMove}</span>
-        <span>You Played: {playerMove}</span>
-        <span>Round Winner: {roundResult}!</span>
+        <span>
+          Computer Played <strong>{computerMove}</strong>, You Played:{" "}
+          <strong>{playerMove}</strong>, Round Winner:{" "}
+          <strong>{roundResult}!</strong>
+        </span>
         <span>
           Stats:{" "}
           <b>
-            {playerWins} {playerWins === 1 ? "win" : "wins"} / {computerWins}
-            {computerWins === 1 ? " loss" : " losses"} / {ties}
-            {ties === 1 ? " tie" : " ties"}
+            {pluralize("win", playerWins)} / {pluralize("loss", computerWins)} /{" "}
+            {pluralize("tie", ties)}
           </b>
         </span>
         <span>
@@ -167,13 +168,28 @@ function App() {
   }
 
   // ###################################################################
+  // =================  Text Formatting Utilities:  ====================
+  // ###################################################################
+
+  // function to take an input and a string and a number of those "things",
+  // and return a (potentially) pluralized version of that string. Useful
+  // if you have, for example 5 : egg and you want to return the string "5 eggs"
+  function pluralize(input: string, occurences: number) {
+    return occurences === 1
+      ? occurences.toString() + " " + input
+      : input.at(-1) === "s"
+      ? occurences.toString() + " " + input + "es"
+      : occurences.toString() + " " + input + "s";
+  }
+
+  // ###################################################################
   // =================  Render Subcomponents:  =========================
   // ###################################################################
 
   function renderHand() {
     return (
       <div className={gameCSS.hand_container}>
-        <ul>{MOVES.map((move) => renderCard(move))}</ul>
+        {MOVES.map((move) => renderCard(move))}
       </div>
     );
   }

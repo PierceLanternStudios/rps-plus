@@ -3,19 +3,20 @@
   background-color: darkslateblue;
   border-radius: 10pt;
   border: 0pt;
-  padding: 24pt 44pt;
-  margin: 0pt 5pt;
+  padding: 20px 45px;
   transition-duration: 0.3s;
+  font-family: "Trebuchet MS";
+  font-size: large;
 }
 
 .button:hover {
   background-color: rgb(49, 41, 95);
-  scale: 1.2;
+  scale: 1.1;
   transition-duration: 0.3s;
 }
 
 .button:focus {
   background-color: rgb(49, 41, 95);
-  scale: 1.2;
+  scale: 1.1;
   transition-duration: 0.3s;
 }
