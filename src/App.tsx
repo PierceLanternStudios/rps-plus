@@ -30,15 +30,21 @@ function App() {
   // =================  Declare State Vars:  ===========================
   // ###################################################################
 
-  const [playerMove, setPlayerMove] = React.useState<Move | null>(null);
-  const [computerMove, setComputerMove] = React.useState<Move | null>(null);
+  const [playerMove, setPlayerMove] = React.useState<Move>("rock");
+  const [computerMove, setComputerMove] = React.useState<Move>("rock");
   const [gamePhase, setGamePhase] = React.useState<GamePhase>("pre-Game");
   const [round, setRound] = React.useState(0);
   const [roundResult, setRoundResult] = React.useState<GameResult>("Tie");
-  const [computerWins, setComputerWins] = React.useState<number>(0);
-  const [playerWins, setPlayerWins] = React.useState<number>(0);
-  const [ties, setTies] = React.useState<number>(0);
   const [useEmojis, setUseEmojis] = React.useState<boolean>(false);
+  const [stats, setStats] = React.useState<{
+    wins: number;
+    losses: number;
+    ties: number;
+  }>({
+    wins: 0,
+    losses: 0,
+    ties: 0,
+  });
 
   // ###################################################################
   // =================  Callback Functions:  ===========================
@@ -74,13 +80,13 @@ function App() {
     // keep track of stats:
     switch (winner) {
       case "You":
-        setPlayerWins(playerWins + 1);
+        setStats({ ...stats, wins: stats.wins + 1 });
         break;
       case "Computer":
-        setComputerWins(computerWins + 1);
+        setStats({ ...stats, losses: stats.losses + 1 });
         break;
       case "Tie":
-        setTies(ties + 1);
+        setStats({ ...stats, ties: stats.ties + 1 });
         break;
     }
 
@@ -92,7 +98,7 @@ function App() {
     if (player === computer) {
       return "Tie";
     } else {
-      return MOVES.indexOf(player!) === (MOVES.indexOf(computer!) + 1) % 3
+      return MOVES.indexOf(player) === (MOVES.indexOf(computer) + 1) % 3
         ? "Computer"
         : "You";
     }
@@ -158,8 +164,8 @@ function App() {
         <h3>Round #{round}:</h3>
         <div className={gameCSS.results_container}>
           <span>
-            Computer Played <strong>{renderEmojis(computerMove!)}</strong>, You
-            Played: <strong>{renderEmojis(playerMove!)}</strong>, Round Winner:{" "}
+            Computer Played <strong>{renderEmojis(computerMove)}</strong>, You
+            Played: <strong>{renderEmojis(playerMove)}</strong>, Round Winner:{" "}
             <strong
               style={{
                 fontSize: "large",
@@ -183,8 +189,8 @@ function App() {
           <span>
             Stats:{" "}
             <b>
-              {pluralize("win", playerWins)} / {pluralize("loss", computerWins)}{" "}
-              / {pluralize("tie", ties)}
+              {pluralize("win", stats.wins)} / {pluralize("loss", stats.losses)}{" "}
+              / {pluralize("tie", stats.ties)}
             </b>
           </span>
           <span>

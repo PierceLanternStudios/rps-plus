@@ -15,20 +15,24 @@
   scale: 1.1;
   transition-duration: 0.3s;
   animation: wiggle 0.35s ease-in-out;
+  animation-direction: alternate;
 }
 
 @keyframes wiggle {
   0% {
     transform: rotate(0deg);
   }
-  25% {
-    transform: rotate(2deg);
+  20% {
+    transform: rotate(1.5deg);
   }
-  50% {
-    transform: rotate(-2deg);
+  40% {
+    transform: rotate(-1.5deg);
   }
-  75% {
-    transform: rotate(2deg);
+  60% {
+    transform: rotate(1.5deg);
+  }
+  80% {
+    transform: rotate(-1.5deg);
   }
   100% {
     transform: rotate(0deg);
