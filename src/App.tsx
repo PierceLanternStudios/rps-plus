@@ -134,9 +134,7 @@ function App() {
     return (
       <div className={splashCSS.container}>
         <div className={gameCSS.hand_container}>
-          <span>
-            <h1>Rock, Paper, Scissors!</h1>
-          </span>
+          <h1>Rock, Paper, Scissors!</h1>
           <div className={gameCSS.results_container}>
             <button onClick={newRound} className={buttonCSS.button}>
               Begin Game
@@ -188,10 +186,10 @@ function App() {
           </span>
           <span>
             Stats:{" "}
-            <b>
+            <strong>
               {pluralize("win", stats.wins)} / {pluralize("loss", stats.losses)}{" "}
               / {pluralize("tie", stats.ties)}
-            </b>
+            </strong>
           </span>
           <span>
             <button onClick={newRound} className={buttonCSS.button}>
