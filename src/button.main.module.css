@@ -1,21 +1,40 @@
 .button {
   color: white;
   background-color: darkslateblue;
-  border-radius: 10pt;
-  border: 0pt;
-  padding: 24pt 44pt;
-  margin: 0pt 5pt;
+  border-radius: 10px;
+  border: 0px;
+  padding: 20px 45px;
   transition-duration: 0.3s;
+  font-family: "Trebuchet MS";
+  font-size: large;
 }
 
-.button:hover {
-  background-color: rgb(49, 41, 95);
-  scale: 1.2;
-  transition-duration: 0.3s;
-}
-
+.button:hover,
 .button:focus {
   background-color: rgb(49, 41, 95);
-  scale: 1.2;
+  scale: 1.1;
   transition-duration: 0.3s;
+  animation: wiggle 0.35s ease-in-out;
+  animation-direction: alternate;
+}
+
+@keyframes wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(1.5deg);
+  }
+  40% {
+    transform: rotate(-1.5deg);
+  }
+  60% {
+    transform: rotate(1.5deg);
+  }
+  80% {
+    transform: rotate(-1.5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }

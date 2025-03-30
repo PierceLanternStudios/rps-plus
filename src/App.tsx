@@ -1,13 +1,15 @@
 import React from "react";
 import { type Move, MOVES } from "./Move";
 import gameCSS from "./game.module.css";
-import ResultPhaseCSS from "./resultsPhase.module.css";
 import buttonCSS from "./button.main.module.css";
 import splashCSS from "./splash.module.css";
+import checkbox from "./checkbox";
 
 type GamePhase = "pre-Game" | "Game" | "Results";
 type gamePlayer = "You" | "Computer";
 type GameResult = gamePlayer | "Tie";
+
+const EMOJIS = { rock: " 🪨", paper: " 📃", scissors: " ✂️" };
 
 /**
  * name:          App
@@ -28,14 +30,21 @@ function App() {
   // =================  Declare State Vars:  ===========================
   // ###################################################################
 
-  const [playerMove, setPlayerMove] = React.useState<Move | null>(null);
-  const [computerMove, setComputerMove] = React.useState<Move | null>(null);
+  const [playerMove, setPlayerMove] = React.useState<Move>("rock");
+  const [computerMove, setComputerMove] = React.useState<Move>("rock");
   const [gamePhase, setGamePhase] = React.useState<GamePhase>("pre-Game");
   const [round, setRound] = React.useState(0);
   const [roundResult, setRoundResult] = React.useState<GameResult>("Tie");
-  const [computerWins, setComputerWins] = React.useState<number>(0);
-  const [playerWins, setPlayerWins] = React.useState<number>(0);
-  const [ties, setTies] = React.useState<number>(0);
+  const [useEmojis, setUseEmojis] = React.useState<boolean>(false);
+  const [stats, setStats] = React.useState<{
+    wins: number;
+    losses: number;
+    ties: number;
+  }>({
+    wins: 0,
+    losses: 0,
+    ties: 0,
+  });
 
   // ###################################################################
   // =================  Callback Functions:  ===========================
@@ -71,13 +80,13 @@ function App() {
     // keep track of stats:
     switch (winner) {
       case "You":
-        setPlayerWins(playerWins + 1);
+        setStats({ ...stats, wins: stats.wins + 1 });
         break;
       case "Computer":
-        setComputerWins(computerWins + 1);
+        setStats({ ...stats, losses: stats.losses + 1 });
         break;
       case "Tie":
-        setTies(ties + 1);
+        setStats({ ...stats, ties: stats.ties + 1 });
         break;
     }
 
@@ -89,7 +98,7 @@ function App() {
     if (player === computer) {
       return "Tie";
     } else {
-      return MOVES.indexOf(player!) === (MOVES.indexOf(computer!) + 1) % 3
+      return MOVES.indexOf(player) === (MOVES.indexOf(computer) + 1) % 3
         ? "Computer"
         : "You";
     }
@@ -124,12 +133,17 @@ function App() {
   function renderPreGame() {
     return (
       <div className={splashCSS.container}>
-        <span>
+        <div className={gameCSS.hand_container}>
           <h1>Rock, Paper, Scissors!</h1>
-        </span>
-        <button onClick={newRound} className={buttonCSS.button}>
-          Begin Game
-        </button>
+          <div className={gameCSS.results_container}>
+            <button onClick={newRound} className={buttonCSS.button}>
+              Begin Game
+            </button>
+            <span>
+              Use Emojis: {checkbox(useEmojis, () => setUseEmojis(!useEmojis))}
+            </span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -144,24 +158,45 @@ function App() {
 
   function renderResults() {
     return (
-      <div className={ResultPhaseCSS.container}>
-        <span>Round #{round}:</span>
-        <span>Computer Played: {computerMove}</span>
-        <span>You Played: {playerMove}</span>
-        <span>Round Winner: {roundResult}!</span>
-        <span>
-          Stats:{" "}
-          <b>
-            {playerWins} {playerWins === 1 ? "win" : "wins"} / {computerWins}
-            {computerWins === 1 ? " loss" : " losses"} / {ties}
-            {ties === 1 ? " tie" : " ties"}
-          </b>
-        </span>
-        <span>
-          <button onClick={newRound} className={buttonCSS.button}>
-            New Round!
-          </button>
-        </span>
+      <div className={gameCSS.container}>
+        <h3>Round #{round}:</h3>
+        <div className={gameCSS.results_container}>
+          <span>
+            Computer Played <strong>{renderEmojis(computerMove)}</strong>, You
+            Played: <strong>{renderEmojis(playerMove)}</strong>, Round Winner:{" "}
+            <strong
+              style={{
+                fontSize: "large",
+                color:
+                  roundResult === "Tie"
+                    ? "black"
+                    : roundResult === "You"
+                    ? "#00FF00"
+                    : "#FF0000",
+                textShadow:
+                  roundResult === "Tie"
+                    ? "0px 0px 5px black"
+                    : roundResult === "You"
+                    ? "0px 0px 5px #00FF00"
+                    : "0px 0px 5px #FF0000",
+              }}
+            >
+              {roundResult}!
+            </strong>
+          </span>
+          <span>
+            Stats:{" "}
+            <strong>
+              {pluralize("win", stats.wins)} / {pluralize("loss", stats.losses)}{" "}
+              / {pluralize("tie", stats.ties)}
+            </strong>
+          </span>
+          <span>
+            <button onClick={newRound} className={buttonCSS.button}>
+              New Round!
+            </button>
+          </span>
+        </div>
       </div>
     );
   }
@@ -173,7 +208,7 @@ function App() {
   function renderHand() {
     return (
       <div className={gameCSS.hand_container}>
-        <ul>{MOVES.map((move) => renderCard(move))}</ul>
+        {MOVES.map((move) => renderCard(move))}
       </div>
     );
   }
@@ -184,11 +219,31 @@ function App() {
         className={buttonCSS.button}
         onClick={() => onCardPlayed(cardName)}
       >
-        {cardName}
+        {renderEmojis(cardName)}
       </button>
     );
   }
 
+  // ###################################################################
+  // =================  Text Formatting Utilities:  ====================
+  // ###################################################################
+
+  // function to take an input and a string and a number of those "things",
+  // and return a (potentially) pluralized version of that string. Useful
+  // if you have, for example 5 : egg and you want to return the string "5 eggs"
+  function pluralize(input: string, occurences: number) {
+    return occurences === 1
+      ? occurences.toString() + " " + input
+      : input.at(-1) === "s"
+      ? occurences.toString() + " " + input + "es"
+      : occurences.toString() + " " + input + "s";
+  }
+
+  // a function to add emojis to a specific Move string. Will only add
+  // the emoji if the state variable "useEmojis" is set.
+  function renderEmojis(cardName: Move) {
+    return useEmojis ? cardName + EMOJIS[cardName] : cardName;
+  }
   // ###################################################################
   // ======================  Main Loop:  ===============================
   // ###################################################################
