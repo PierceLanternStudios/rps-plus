@@ -160,7 +160,25 @@ function App() {
           <span>
             Computer Played <strong>{renderEmojis(computerMove!)}</strong>, You
             Played: <strong>{renderEmojis(playerMove!)}</strong>, Round Winner:{" "}
-            <strong>{roundResult}!</strong>
+            <strong
+              style={{
+                fontSize: "large",
+                color:
+                  roundResult === "Tie"
+                    ? "black"
+                    : roundResult === "You"
+                    ? "#00FF00"
+                    : "#FF0000",
+                textShadow:
+                  roundResult === "Tie"
+                    ? "0px 0px 5px black"
+                    : roundResult === "You"
+                    ? "0px 0px 5px #00FF00"
+                    : "0px 0px 5px #FF0000",
+              }}
+            >
+              {roundResult}!
+            </strong>
           </span>
           <span>
             Stats:{" "}
