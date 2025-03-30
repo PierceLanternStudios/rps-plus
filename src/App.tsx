@@ -1,13 +1,15 @@
 import React from "react";
 import { type Move, MOVES } from "./Move";
 import gameCSS from "./game.module.css";
-import ResultPhaseCSS from "./resultsPhase.module.css";
 import buttonCSS from "./button.main.module.css";
 import splashCSS from "./splash.module.css";
+import checkbox from "./checkbox";
 
 type GamePhase = "pre-Game" | "Game" | "Results";
 type gamePlayer = "You" | "Computer";
 type GameResult = gamePlayer | "Tie";
+
+const EMOJIS = { rock: " 🪨", paper: " 📃", scissors: " ✂️" };
 
 /**
  * name:          App
@@ -36,6 +38,7 @@ function App() {
   const [computerWins, setComputerWins] = React.useState<number>(0);
   const [playerWins, setPlayerWins] = React.useState<number>(0);
   const [ties, setTies] = React.useState<number>(0);
+  const [useEmojis, setUseEmojis] = React.useState<boolean>(false);
 
   // ###################################################################
   // =================  Callback Functions:  ===========================
@@ -124,12 +127,19 @@ function App() {
   function renderPreGame() {
     return (
       <div className={splashCSS.container}>
-        <span>
-          <h1>Rock, Paper, Scissors!</h1>
-        </span>
-        <button onClick={newRound} className={buttonCSS.button}>
-          Begin Game
-        </button>
+        <div className={gameCSS.hand_container}>
+          <span>
+            <h1>Rock, Paper, Scissors!</h1>
+          </span>
+          <div className={gameCSS.results_container}>
+            <button onClick={newRound} className={buttonCSS.button}>
+              Begin Game
+            </button>
+            <span>
+              Use Emojis: {checkbox(useEmojis, () => setUseEmojis(!useEmojis))}
+            </span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -145,41 +155,28 @@ function App() {
   function renderResults() {
     return (
       <div className={gameCSS.container}>
-        <span>Round #{round}:</span>
-        <span>
-          Computer Played <strong>{computerMove}</strong>, You Played:{" "}
-          <strong>{playerMove}</strong>, Round Winner:{" "}
-          <strong>{roundResult}!</strong>
-        </span>
-        <span>
-          Stats:{" "}
-          <b>
-            {pluralize("win", playerWins)} / {pluralize("loss", computerWins)} /{" "}
-            {pluralize("tie", ties)}
-          </b>
-        </span>
-        <span>
-          <button onClick={newRound} className={buttonCSS.button}>
-            New Round!
-          </button>
-        </span>
+        <h3>Round #{round}:</h3>
+        <div className={gameCSS.results_container}>
+          <span>
+            Computer Played <strong>{renderEmojis(computerMove!)}</strong>, You
+            Played: <strong>{renderEmojis(playerMove!)}</strong>, Round Winner:{" "}
+            <strong>{roundResult}!</strong>
+          </span>
+          <span>
+            Stats:{" "}
+            <b>
+              {pluralize("win", playerWins)} / {pluralize("loss", computerWins)}{" "}
+              / {pluralize("tie", ties)}
+            </b>
+          </span>
+          <span>
+            <button onClick={newRound} className={buttonCSS.button}>
+              New Round!
+            </button>
+          </span>
+        </div>
       </div>
     );
-  }
-
-  // ###################################################################
-  // =================  Text Formatting Utilities:  ====================
-  // ###################################################################
-
-  // function to take an input and a string and a number of those "things",
-  // and return a (potentially) pluralized version of that string. Useful
-  // if you have, for example 5 : egg and you want to return the string "5 eggs"
-  function pluralize(input: string, occurences: number) {
-    return occurences === 1
-      ? occurences.toString() + " " + input
-      : input.at(-1) === "s"
-      ? occurences.toString() + " " + input + "es"
-      : occurences.toString() + " " + input + "s";
   }
 
   // ###################################################################
@@ -200,11 +197,31 @@ function App() {
         className={buttonCSS.button}
         onClick={() => onCardPlayed(cardName)}
       >
-        {cardName}
+        {renderEmojis(cardName)}
       </button>
     );
   }
 
+  // ###################################################################
+  // =================  Text Formatting Utilities:  ====================
+  // ###################################################################
+
+  // function to take an input and a string and a number of those "things",
+  // and return a (potentially) pluralized version of that string. Useful
+  // if you have, for example 5 : egg and you want to return the string "5 eggs"
+  function pluralize(input: string, occurences: number) {
+    return occurences === 1
+      ? occurences.toString() + " " + input
+      : input.at(-1) === "s"
+      ? occurences.toString() + " " + input + "es"
+      : occurences.toString() + " " + input + "s";
+  }
+
+  // a function to add emojis to a specific Move string. Will only add
+  // the emoji if the state variable "useEmojis" is set.
+  function renderEmojis(cardName: Move) {
+    return useEmojis ? cardName + EMOJIS[cardName] : cardName;
+  }
   // ###################################################################
   // ======================  Main Loop:  ===============================
   // ###################################################################
