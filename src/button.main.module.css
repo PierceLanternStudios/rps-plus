@@ -14,4 +14,23 @@
   background-color: rgb(49, 41, 95);
   scale: 1.1;
   transition-duration: 0.3s;
+  animation: wiggle 0.35s ease-in-out;
+}
+
+@keyframes wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(2deg);
+  }
+  50% {
+    transform: rotate(-2deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
